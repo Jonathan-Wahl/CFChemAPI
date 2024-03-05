@@ -4,9 +4,9 @@ from flask import Blueprint, request
 from database.database import database
 search = Blueprint('search', __name__, url_prefix="/search")
 
-
+@search.route('/<include_sources>')
 @search.route('/')
-def index():
+def index(include_sources: bool = False):
     """Endpoint returning lincs objects based on search parameter (query)
     This endpoint allows you to return a list of Lincs objects.
     ---
@@ -50,5 +50,11 @@ def index():
     LIMIT %(limit)s
     OFFSET %(offset)s
     """, {'input': input, 'rawinput': rawInput, 'limit': limit, 'offset': offset})
-    
+    if include_sources:
+        SOURCES = ["idg", "drugcentral", "refmet", "lincs", "glygen", "reprotox"]
+        for dict_row in searchCollection:
+          mol_id = dict_row["mol_id"]
+          mol_sources = database.get_sources(mol_id, SOURCES)
+          # this assumes there is not a "sources" key in the dict_row
+          dict_row["sources"] = mol_sources
     return searchCollection

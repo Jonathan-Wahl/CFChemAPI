@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import request, abort
 from flask import current_app
 import psycopg2
 import psycopg2.extras

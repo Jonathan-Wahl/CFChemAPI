@@ -1,9 +1,7 @@
 # blueprints/search.py
 
-from flask import Flask, Blueprint, request, abort, current_app
+from flask import Blueprint, request
 from database.database import database
-import psycopg2.extras
-from psycopg2.extensions import AsIs
 search = Blueprint('search', __name__, url_prefix="/search")
 
 

@@ -52,9 +52,8 @@ def index(include_sources: bool = False):
     """, {'input': input, 'rawinput': rawInput, 'limit': limit, 'offset': offset})
     if include_sources:
         SOURCES = ["idg", "drugcentral", "refmet", "lincs", "glygen", "reprotox"]
+        mol_ids = [dict_row["mol_id"] for dict_row in searchCollection]
+        mol_sources_dict = database.get_sources(mol_ids, SOURCES)
         for dict_row in searchCollection:
-          mol_id = dict_row["mol_id"]
-          mol_sources = database.get_sources(mol_id, SOURCES)
-          # this assumes there is not a "sources" key in the dict_row
-          dict_row["sources"] = mol_sources
+            dict_row["sources"] = mol_sources_dict[dict_row["mol_id"]]
     return searchCollection

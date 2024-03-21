@@ -29,17 +29,18 @@ class database:
             connection.close()
         return res
     
-    def get_sources(mol_id: int, sources: list[str]) -> dict[str, bool]:
-        # retrieve tables where molecule has an entry
+    def get_sources(mol_ids: list[int], sources: list[str]) -> dict[str, dict[str, bool]]:
+        # retrieve tables where molecules have an entry
         # helps determine what sources contain the molecule/where info is coming from
         connection = database.connect()
         cursor = connection.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
         results = {}
         try:
-            query = " UNION ALL ".join(f"(SELECT '{source}' as source, EXISTS(SELECT 1 FROM {source} WHERE mol_id={mol_id}) as exists)" for source in sources)
-            cursor.execute(query)
-            res = cursor.fetchall()
-            results = {row['source']: row['exists'] for row in res}
+            for mol_id in mol_ids:
+                query = " UNION ALL ".join(f"(SELECT '{source}' as source, EXISTS(SELECT 1 FROM {source} WHERE mol_id={mol_id}) as exists)" for source in sources)
+                cursor.execute(query)
+                res = cursor.fetchall()
+                results[mol_id] = {row['source']: row['exists'] for row in res}
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
             raise error
